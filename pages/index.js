@@ -4,8 +4,9 @@
  * @Author: jimmiezhou
  * @Date: 2019-10-14 09:36:53
  * @LastEditors: jimmiezhou
- * @LastEditTime: 2019-10-14 11:17:49
+ * @LastEditTime: 2019-10-14 15:29:21
  */
-import {Button} from 'antd'
 
-export default ()=><Button>index-page</Button>
+export default () => {
+  return <div>Index</div>;
+};
