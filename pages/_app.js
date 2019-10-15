@@ -4,14 +4,20 @@
  * @Author: jimmiezhou
  * @Date: 2019-10-14 11:19:38
  * @LastEditors: jimmiezhou
- * @LastEditTime: 2019-10-14 15:14:58
+ * @LastEditTime: 2019-10-15 10:45:22
  */
 import App, { Container } from "next/app";
 // _app自定义layout
 import Layout from "../components/Layout";
 // 这里暂时整体引入antd的样式 mini-css-plugin中的bug
+
+import MyContext from "../lib/my-context";
 import "antd/dist/antd.css";
 class MyApp extends App {
+  state = {
+    value: 100
+  };
+
   // _app 自定义数据
   static async getInitialProps({ Component, ctx }) {
     let pageProps;
@@ -28,7 +34,21 @@ class MyApp extends App {
     return (
       <Container>
         <Layout>
-          <Component {...pageProps}></Component>
+          <MyContext.Provider value={this.state.value}>
+            <button
+              onClick={() =>
+                this.setState(state => {
+                  return {
+                    ...state,
+                    value: state.value + 1
+                  };
+                })
+              }
+            >
+              +
+            </button>
+            <Component {...pageProps}></Component>
+          </MyContext.Provider>
         </Layout>
       </Container>
     );

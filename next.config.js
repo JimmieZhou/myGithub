@@ -4,12 +4,12 @@
  * @Author: jimmiezhou
  * @Date: 2019-10-14 11:06:20
  * @LastEditors: jimmiezhou
- * @LastEditTime: 2019-10-14 16:36:32
+ * @LastEditTime: 2019-10-14 17:18:24
  */
 
 // next支持使用css
 const withCss = require('@zeit/next-css')
-const config = require('./config')
+// const config = require('./config')
 
 const configs = {
   // 编译文件的输出目录
@@ -66,10 +66,10 @@ const GITHUB_OAUTH_URL = 'https://github.com/login/oauth/authorize'
 const SCOPE = 'user'
 
 module.exports = withCss({
-  publicRuntimeConfig: {
-    GITHUB_OAUTH_URL,
-    OAUTH_URL: `${GITHUB_OAUTH_URL}?client_id=${
-      config.github.client_id
-    }&scope=${SCOPE}`,
-  },
+  // publicRuntimeConfig: {
+  //   GITHUB_OAUTH_URL,
+  //   OAUTH_URL: `${GITHUB_OAUTH_URL}?client_id=${
+  //     config.github.client_id
+  //   }&scope=${SCOPE}`,
+  // },
 })
