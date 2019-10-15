@@ -4,22 +4,31 @@
  * @Author: jimmiezhou
  * @Date: 2019-10-14 14:57:38
  * @LastEditors: jimmiezhou
- * @LastEditTime: 2019-10-14 16:09:57
+ * @LastEditTime: 2019-10-15 16:12:12
  */
-import Document, { Html, Head, Main, NextScript } from "next/document";
+import Docuemnt, { Html, Head, Main, NextScript } from "next/document";
 import { ServerStyleSheet } from "styled-components";
 
-class MyDocument extends Document {
+function withLog(Comp) {
+  return props => {
+    console.log(props);
+    return <Comp {...props} />;
+  };
+}
+
+class MyDocument extends Docuemnt {
   static async getInitialProps(ctx) {
     const sheet = new ServerStyleSheet();
     const originalRenderPage = ctx.renderPage;
+
     try {
       ctx.renderPage = () =>
         originalRenderPage({
-          enhanceApp: App => props =>
-            sheet.collectStyles(<App {...props}></App>)
+          enhanceApp: App => props => sheet.collectStyles(<App {...props} />)
         });
-      const props = await Document.getInitialProps(ctx);
+
+      const props = await Docuemnt.getInitialProps(ctx);
+
       return {
         ...props,
         styles: (
@@ -37,13 +46,14 @@ class MyDocument extends Document {
   render() {
     return (
       <Html>
-        <Head></Head>
+        <Head />
         <body>
-          <Main></Main>
-          <NextScript></NextScript>
+          <Main />
+          <NextScript />
         </body>
       </Html>
     );
   }
 }
+
 export default MyDocument;

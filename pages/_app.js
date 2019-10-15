@@ -4,55 +4,50 @@
  * @Author: jimmiezhou
  * @Date: 2019-10-14 11:19:38
  * @LastEditors: jimmiezhou
- * @LastEditTime: 2019-10-15 10:45:22
+ * @LastEditTime: 2019-10-15 16:35:48
  */
-import App, { Container } from "next/app";
-// _app自定义layout
-import Layout from "../components/Layout";
-// 这里暂时整体引入antd的样式 mini-css-plugin中的bug
+import App, { Container } from 'next/app'
+import { Provider } from 'react-redux'
 
-import MyContext from "../lib/my-context";
-import "antd/dist/antd.css";
+import 'antd/dist/antd.css'
+
+import MyContext from '../lib/my-context'
+import Layout from '../components/Layout'
+
+import withRedux from '../lib/withRedux'
+
 class MyApp extends App {
   state = {
-    value: 100
-  };
+    context: 'value',
+  }
 
-  // _app 自定义数据
-  static async getInitialProps({ Component, ctx }) {
-    let pageProps;
+  static async getInitialProps(ctx) {
+    const { Component } = ctx
+    console.log('app init')
+    let pageProps = {}
     if (Component.getInitialProps) {
-      pageProps = await Component.getInitialProps(ctx);
+      pageProps = await Component.getInitialProps(ctx)
     }
     return {
-      pageProps
-    };
+      pageProps,
+    }
   }
 
   render() {
-    const { Component, pageProps } = this.props;
+    const { Component, pageProps, reduxStore } = this.props
+
     return (
       <Container>
         <Layout>
-          <MyContext.Provider value={this.state.value}>
-            <button
-              onClick={() =>
-                this.setState(state => {
-                  return {
-                    ...state,
-                    value: state.value + 1
-                  };
-                })
-              }
-            >
-              +
-            </button>
-            <Component {...pageProps}></Component>
-          </MyContext.Provider>
+          <Provider store={reduxStore}>
+            <MyContext.Provider value={this.state.context}>
+              <Component {...pageProps} />
+            </MyContext.Provider>
+          </Provider>
         </Layout>
       </Container>
-    );
+    )
   }
 }
 
-export default MyApp;
+export default withRedux(MyApp)
