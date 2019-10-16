@@ -4,60 +4,63 @@
  * @Author: jimmiezhou
  * @Date: 2019-10-16 15:10:02
  * @LastEditors: jimmiezhou
- * @LastEditTime: 2019-10-16 16:41:50
+ * @LastEditTime: 2019-10-16 16:54:48
  */
-const axios = require('axios')
+const axios = require("axios");
 
-const config = require('../config')
+const config = require("../config");
 
-const { client_id, client_secret, request_token_url } = config.github
+const { client_id, client_secret, request_token_url } = config.github;
 
 module.exports = server => {
   server.use(async (ctx, next) => {
-    if (ctx.path === '/auth') {
-      const code = ctx.query.code
+    // doc: https://developer.github.com/apps/building-oauth-apps/authorizing-oauth-apps/
+    // 这里https://github.com/login/oauth/authorize？client_id=b50f64b8e843c7f47137,请求后会跳转到
+    // http://localhost:3000/auth?code=57f71043c9cc20586f75
+    if (ctx.path === "/auth") {
+      const code = ctx.query.code;
       if (!code) {
-        ctx.body = 'code not exist'
-        return
+        ctx.body = "code not exist";
+        return;
       }
       const result = await axios({
-        method: 'POST',
+        method: "POST",
         url: request_token_url,
         data: {
           client_id,
           client_secret,
-          code,
+          code
         },
         headers: {
-          Accept: 'application/json',
-        },
-      })
+          Accept: "application/json"
+        }
+      });
 
-      console.log(result.status, result.data)
+      console.log(result.status, result.data);
 
       if (result.status === 200 && (result.data && !result.data.error)) {
-        ctx.session.githubAuth = result.data
+        ctx.session.githubAuth = result.data;
 
-        const { access_token, token_type } = result.data
+        const { access_token, token_type } = result.data;
 
         const userInfoResp = await axios({
-          method: 'GET',
-          url: 'https://api.github.com/user',
+          method: "GET",
+          url: "https://api.github.com/user",
           headers: {
-            Authorization: `${token_type} ${access_token}`,
-          },
-        })
+            Authorization: `${token_type} ${access_token}`
+          }
+        });
 
         // console.log(userInfoResp.data)
-        ctx.session.userInfo = userInfoResp.data
+        ctx.session.userInfo = userInfoResp.data;
 
-        ctx.redirect('/')
+        ctx.redirect("/");
       } else {
-        const errorMsg = result.data && result.data.error
-        ctx.body = `request token failed ${errorMsg}`
+        const errorMsg = result.data && result.data.error;
+        ctx.body = `request token failed ${errorMsg}`;
       }
     } else {
-      await next()
+      await next();
     }
-  })
-}
+  });
+};
