@@ -4,52 +4,71 @@
  * @Author: jimmiezhou
  * @Date: 2019-10-14 09:48:57
  * @LastEditors: jimmiezhou
- * @LastEditTime: 2019-10-14 14:02:43
+ * @LastEditTime: 2019-10-16 16:15:48
  */
-const Koa = require('koa')
-const Router = require('koa-router')
-const next = require('next')
+const Koa = require("koa");
+const Router = require("koa-router");
+const next = require("next");
+const session = require("koa-session");
+const Redis = require("ioredis");
+const auth = require("./server/auth");
+const RedisSessionStore = require("./server/session-store");
+const dev = process.env.NODE_ENV !== "production";
+const app = next({ dev });
+const handle = app.getRequestHandler();
 
-const dev = process.env.NODE_ENV !== 'production'
+// 创建redis client
+const redis = new Redis();
 
-const app = next({ dev })
-const handler = app.getRequestHandler()
-
-// 等待page目录下的页面相应完成之后再使用koa
 app.prepare().then(() => {
-    const server = new Koa()
-    const router = new Router()
+  const server = new Koa();
+  const router = new Router();
 
-    // 路由映射
-    router.get('/a/:id', async ctx => {
-        const id = ctx.params.id
-        await handler(ctx.req, ctx.res, {
-            pathname: '/a',
-            query: {
-                id
-            }
-        })
-        ctx.respond = false
-    })
+  server.keys = ["Jimmie's develop Github App"];
+  const SESSION_CONFIG = {
+    key: "jid",
+    store: new RedisSessionStore(redis)
+  };
 
-    router.get('/b/:id', async ctx => {
-        const id = ctx.params.id
-        await handler(ctx.req, ctx.res, {
-            pathname: '/b',
-            query: {
-                id
-            }
-        })
-        ctx.respond = false
-    })
+  server.use(session(SESSION_CONFIG, server));
 
-    server.use(router.routes())
+  // 配置处理github OAuth的登录
+  auth(server);
 
-    server.use(async (ctx, next) => {
-        await handler(ctx.req, ctx.res)
-        ctx.respond = false
-    })
-    server.listen(3000, () => {
-        console.log('server listen on 3000')
-    })
-})
+  router.get("/a/:id", async ctx => {
+    const id = ctx.params.id;
+    await handle(ctx.req, ctx.res, {
+      pathname: "/a",
+      query: { id }
+    });
+    ctx.respond = false;
+  });
+
+  router.get("/api/user/info", async ctx => {
+    const user = ctx.session.userInfo;
+    if (!user) {
+      ctx.status = 401;
+      ctx.body = "Need Login";
+    } else {
+      ctx.body = user;
+      ctx.set("Content-Type", "application/json");
+    }
+  });
+
+  server.use(router.routes());
+
+  server.use(async (ctx, next) => {
+    await handle(ctx.req, ctx.res);
+    ctx.respond = false;
+  });
+
+  server.use(async (ctx, next) => {
+    ctx.res.statusCode = 200;
+    await next();
+  });
+
+  server.listen(3000, () => {
+    console.log("koa server listening on 3000");
+  });
+
+});

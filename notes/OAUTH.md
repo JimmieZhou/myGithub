@@ -2,8 +2,8 @@
  * @Description: In User Settings Edit
  * @Author: your name
  * @Date: 2019-09-29 17:33:54
- * @LastEditTime: 2019-09-30 10:08:47
- * @LastEditors: Please set LastEditors
+ * @LastEditTime: 2019-10-16 14:15:20
+ * @LastEditors: jimmiezhou
  -->
 
 ## 认证和授权
@@ -44,3 +44,6 @@
 ## OAuth 授权流程
 
 ![图片](./OAuthCode.jpg)
+
+## cookie
+>cookie就是cookie，保存session是它其中的一部分功能
