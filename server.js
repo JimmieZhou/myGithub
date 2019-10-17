@@ -4,7 +4,7 @@
  * @Author: jimmiezhou
  * @Date: 2019-10-14 09:48:57
  * @LastEditors: jimmiezhou
- * @LastEditTime: 2019-10-17 11:43:48
+ * @LastEditTime: 2019-10-17 17:02:37
  */
 const Koa = require("koa");
 const Router = require("koa-router");
@@ -12,6 +12,7 @@ const next = require("next");
 const session = require("koa-session");
 const Redis = require("ioredis");
 const auth = require("./server/auth");
+const api = require("./server/api");
 const RedisSessionStore = require("./server/session-store");
 const dev = process.env.NODE_ENV !== "production";
 const app = next({ dev });
@@ -34,6 +35,7 @@ app.prepare().then(() => {
 
   // 配置处理github OAuth的登录
   auth(server);
+  api(server);
 
   router.get("/a/:id", async ctx => {
     const id = ctx.params.id;
@@ -59,7 +61,7 @@ app.prepare().then(() => {
 
   server.use(async (ctx, next) => {
     // 保存session
-    ctx.req.session = ctx.session
+    ctx.req.session = ctx.session;
     await handle(ctx.req, ctx.res);
     ctx.respond = false;
   });
@@ -72,5 +74,4 @@ app.prepare().then(() => {
   server.listen(3000, () => {
     console.log("koa server listening on 3000");
   });
-
 });

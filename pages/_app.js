@@ -4,21 +4,52 @@
  * @Author: jimmiezhou
  * @Date: 2019-10-14 11:19:38
  * @LastEditors: jimmiezhou
- * @LastEditTime: 2019-10-17 11:52:37
+ * @LastEditTime: 2019-10-17 16:47:30
  */
 import App, { Container } from "next/app";
 import { Provider } from "react-redux";
-
 import "antd/dist/antd.css";
-
-import Layout from "../components/Layout";
-
+import Router from "next/router";
+import Link from "next/link";
+import axios from "axios";
 import withRedux from "../lib/withRedux";
+import Layout from "../components/Layout";
+import PageLoading from "../components/PageLoading";
 
 class MyApp extends App {
   state = {
-    context: "value"
+    context: "value",
+    loading: false
   };
+
+  startLoading = () => {
+    this.setState({
+      loading: true
+    });
+  };
+
+  stopLoading = () => {
+    this.setState({
+      loading: false
+    });
+  };
+
+  componentDidMount() {
+    Router.events.on("routeChangeStart", this.startLoading);
+    Router.events.on("routeChangeComplete", this.stopLoading);
+    Router.events.on("routeChangeError", this.stopLoading);
+    axios
+      .get("/github/search/repositories?q=react")
+      .then(resp => {
+        console.log(resp);
+      });
+  }
+
+  componentWillUnmount() {
+    Router.events.off("routeChangeStart", this.startLoading);
+    Router.events.off("routeChangeComplete", this.stopLoading);
+    Router.events.off("routeChangeError", this.stopLoading);
+  }
 
   static async getInitialProps(ctx) {
     const { Component } = ctx;
@@ -34,10 +65,11 @@ class MyApp extends App {
 
   render() {
     const { Component, pageProps, reduxStore } = this.props;
-
+    const { loading } = this.state;
     return (
       <Container>
         <Provider store={reduxStore}>
+          {loading ? <PageLoading /> : null}
           <Layout>
             <Component {...pageProps} />
           </Layout>

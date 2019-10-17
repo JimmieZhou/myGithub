@@ -4,6 +4,9 @@ import { Layout, Icon, Input, Avatar, Tooltip, Dropdown, Menu } from "antd";
 import getConfig from "next/config";
 import Container from "./Container";
 import { logout } from "../store/store";
+import axios from "axios";
+import { withRouter } from "next/router";
+import Link from "next/link";
 
 const { publicRuntimeConfig } = getConfig();
 const { Header, Content, Footer } = Layout;
@@ -20,26 +23,31 @@ const footerStyle = {
   textAlign: "center"
 };
 
-function MyLayout({ children, user, logout }) {
-  const [search, setSearch] = useState("");
+function MyLayout({ children, user, logout, router }) {
+  const urlQuery = router.query && router.query.query;
+  const [search, setSearch] = useState(urlQuery || "");
   const handleSearchChange = useCallback(
     event => {
       setSearch(event.target.value);
     },
     [setSearch]
   );
-  const handleOnsearch = useCallback(() => {}, []);
+  const handleOnsearch = useCallback(() => {
+    router.push(`/search?query=${search}`);
+  }, [search]);
 
-  const handelLogout = useCallback(() => {
-    logout();
-  }, []);
+  const handelLogout = useCallback(
+    e => {
+      e.preventDefault();
+      logout();
+    },
+    [logout]
+  );
 
   const userDropDown = () => (
     <Menu>
       <Menu.Item>
-        <a href="#" onClick={handelLogout}>
-          登出
-        </a>
+        <a onClick={handelLogout}>登出</a>
       </Menu.Item>
     </Menu>
   );
@@ -49,7 +57,9 @@ function MyLayout({ children, user, logout }) {
         <Container renderer={<div className="header-inner" />}>
           <div className="header-left">
             <div className="logo">
-              <Icon type="github" style={githubIconStyle} />
+              <Link href="/">
+                <Icon type="github" style={githubIconStyle} />
+              </Link>
             </div>
             <div>
               <Input.Search
@@ -70,7 +80,7 @@ function MyLayout({ children, user, logout }) {
                 </Dropdown>
               ) : (
                 <Tooltip title="点击进行登录">
-                  <a href={publicRuntimeConfig.OAUTH_URL}>
+                  <a href={`/prepare-auth?url=${router.asPath}`}>
                     <Avatar size="40" icon="user" />
                   </a>
                 </Tooltip>
@@ -101,11 +111,14 @@ function MyLayout({ children, user, logout }) {
             height: 100%;
           }
           .ant-layout {
-            height: 100%;
+            min-height: 100%;
           }
           .ant-layout-header {
             padding-left: 0;
             padding-right: 0;
+          }
+          .ant-layout-content {
+            background: #fff;
           }
         `}
       </style>
@@ -123,4 +136,4 @@ export default connect(
       logout: () => dispath(logout())
     };
   }
-)(MyLayout);
+)(withRouter(MyLayout));

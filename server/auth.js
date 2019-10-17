@@ -4,7 +4,7 @@
  * @Author: jimmiezhou
  * @Date: 2019-10-16 15:10:02
  * @LastEditors: jimmiezhou
- * @LastEditTime: 2019-10-17 14:14:53
+ * @LastEditTime: 2019-10-17 15:35:42
  */
 const axios = require("axios");
 
@@ -49,7 +49,8 @@ module.exports = server => {
           }
         });
         ctx.session.userInfo = userInfoResp.data;
-        ctx.redirect("/");
+        ctx.redirect((ctx.session && ctx.session.urlBeforeOAuth) || "/");
+        ctx.session.urlBeforeOAuth = "";
       } else {
         const errorMsg = result.data && result.data.error;
         ctx.body = `request token failed ${errorMsg}`;
@@ -63,6 +64,16 @@ module.exports = server => {
     if (path === "/logout" && method === "POST") {
       ctx.session = null;
       ctx.body = "logout success";
+    } else {
+      await next();
+    }
+  });
+  server.use(async (ctx, next) => {
+    const { path, method } = ctx;
+    if (path === "/prepare-auth" && method === "GET") {
+      const { url } = ctx.query;
+      ctx.session.urlBeforeOAuth = url;
+      ctx.redirect(config.OAUTH_URL);
     } else {
       await next();
     }
