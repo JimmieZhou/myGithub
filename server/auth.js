@@ -4,7 +4,7 @@
  * @Author: jimmiezhou
  * @Date: 2019-10-16 15:10:02
  * @LastEditors: jimmiezhou
- * @LastEditTime: 2019-10-16 16:54:48
+ * @LastEditTime: 2019-10-17 14:14:53
  */
 const axios = require("axios");
 
@@ -36,8 +36,6 @@ module.exports = server => {
         }
       });
 
-      console.log(result.status, result.data);
-
       if (result.status === 200 && (result.data && !result.data.error)) {
         ctx.session.githubAuth = result.data;
 
@@ -50,15 +48,21 @@ module.exports = server => {
             Authorization: `${token_type} ${access_token}`
           }
         });
-
-        // console.log(userInfoResp.data)
         ctx.session.userInfo = userInfoResp.data;
-
         ctx.redirect("/");
       } else {
         const errorMsg = result.data && result.data.error;
         ctx.body = `request token failed ${errorMsg}`;
       }
+    } else {
+      await next();
+    }
+  });
+  server.use(async (ctx, next) => {
+    const { path, method } = ctx;
+    if (path === "/logout" && method === "POST") {
+      ctx.session = null;
+      ctx.body = "logout success";
     } else {
       await next();
     }

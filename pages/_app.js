@@ -4,50 +4,47 @@
  * @Author: jimmiezhou
  * @Date: 2019-10-14 11:19:38
  * @LastEditors: jimmiezhou
- * @LastEditTime: 2019-10-15 16:35:48
+ * @LastEditTime: 2019-10-17 11:52:37
  */
-import App, { Container } from 'next/app'
-import { Provider } from 'react-redux'
+import App, { Container } from "next/app";
+import { Provider } from "react-redux";
 
-import 'antd/dist/antd.css'
+import "antd/dist/antd.css";
 
-import MyContext from '../lib/my-context'
-import Layout from '../components/Layout'
+import Layout from "../components/Layout";
 
-import withRedux from '../lib/withRedux'
+import withRedux from "../lib/withRedux";
 
 class MyApp extends App {
   state = {
-    context: 'value',
-  }
+    context: "value"
+  };
 
   static async getInitialProps(ctx) {
-    const { Component } = ctx
-    console.log('app init')
-    let pageProps = {}
+    const { Component } = ctx;
+    console.log("app init");
+    let pageProps = {};
     if (Component.getInitialProps) {
-      pageProps = await Component.getInitialProps(ctx)
+      pageProps = await Component.getInitialProps(ctx);
     }
     return {
-      pageProps,
-    }
+      pageProps
+    };
   }
 
   render() {
-    const { Component, pageProps, reduxStore } = this.props
+    const { Component, pageProps, reduxStore } = this.props;
 
     return (
       <Container>
-        <Layout>
-          <Provider store={reduxStore}>
-            <MyContext.Provider value={this.state.context}>
-              <Component {...pageProps} />
-            </MyContext.Provider>
-          </Provider>
-        </Layout>
+        <Provider store={reduxStore}>
+          <Layout>
+            <Component {...pageProps} />
+          </Layout>
+        </Provider>
       </Container>
-    )
+    );
   }
 }
 
-export default withRedux(MyApp)
+export default withRedux(MyApp);

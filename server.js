@@ -4,7 +4,7 @@
  * @Author: jimmiezhou
  * @Date: 2019-10-14 09:48:57
  * @LastEditors: jimmiezhou
- * @LastEditTime: 2019-10-16 16:15:48
+ * @LastEditTime: 2019-10-17 11:43:48
  */
 const Koa = require("koa");
 const Router = require("koa-router");
@@ -58,6 +58,8 @@ app.prepare().then(() => {
   server.use(router.routes());
 
   server.use(async (ctx, next) => {
+    // 保存session
+    ctx.req.session = ctx.session
     await handle(ctx.req, ctx.res);
     ctx.respond = false;
   });
