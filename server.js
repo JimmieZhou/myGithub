@@ -4,12 +4,13 @@
  * @Author: jimmiezhou
  * @Date: 2019-10-14 09:48:57
  * @LastEditors: jimmiezhou
- * @LastEditTime: 2019-10-17 17:02:37
+ * @LastEditTime: 2019-10-18 10:50:37
  */
 const Koa = require("koa");
 const Router = require("koa-router");
 const next = require("next");
 const session = require("koa-session");
+const koaBody = require('koa-body')
 const Redis = require("ioredis");
 const auth = require("./server/auth");
 const api = require("./server/api");
@@ -31,6 +32,7 @@ app.prepare().then(() => {
     store: new RedisSessionStore(redis)
   };
 
+  server.use(koaBody())
   server.use(session(SESSION_CONFIG, server));
 
   // 配置处理github OAuth的登录

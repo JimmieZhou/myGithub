@@ -4,7 +4,7 @@
  * @Author: jimmiezhou
  * @Date: 2019-10-14 11:19:38
  * @LastEditors: jimmiezhou
- * @LastEditTime: 2019-10-17 16:47:30
+ * @LastEditTime: 2019-10-18 09:42:10
  */
 import App, { Container } from "next/app";
 import { Provider } from "react-redux";
@@ -38,11 +38,7 @@ class MyApp extends App {
     Router.events.on("routeChangeStart", this.startLoading);
     Router.events.on("routeChangeComplete", this.stopLoading);
     Router.events.on("routeChangeError", this.stopLoading);
-    axios
-      .get("/github/search/repositories?q=react")
-      .then(resp => {
-        console.log(resp);
-      });
+    
   }
 
   componentWillUnmount() {
