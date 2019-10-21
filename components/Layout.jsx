@@ -4,7 +4,6 @@ import { Layout, Icon, Input, Avatar, Tooltip, Dropdown, Menu } from "antd";
 import getConfig from "next/config";
 import Container from "./Container";
 import { logout } from "../store/store";
-import axios from "axios";
 import { withRouter } from "next/router";
 import Link from "next/link";
 
