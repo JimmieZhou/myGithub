@@ -8,6 +8,9 @@ const style = {
   paddingRight: 20
 };
 
+/**
+ * 利用cloneElement扩展组件可复用性
+ */
 export default ({ children, renderer = <div /> }) => {
   return cloneElement(renderer, {
     style: Object.assign({}, renderer.props.style, style),

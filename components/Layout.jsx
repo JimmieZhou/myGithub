@@ -1,13 +1,11 @@
 import { useState, useCallback } from "react";
 import { connect } from "react-redux";
 import { Layout, Icon, Input, Avatar, Tooltip, Dropdown, Menu } from "antd";
-import getConfig from "next/config";
 import Container from "./Container";
 import { logout } from "../store/store";
 import { withRouter } from "next/router";
 import Link from "next/link";
 
-const { publicRuntimeConfig } = getConfig();
 const { Header, Content, Footer } = Layout;
 
 const githubIconStyle = {
