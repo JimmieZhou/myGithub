@@ -4,15 +4,15 @@
  * @Author: jimmiezhou
  * @Date: 2019-10-14 11:19:38
  * @LastEditors: jimmiezhou
- * @LastEditTime: 2019-10-22 10:19:55
+ * @LastEditTime: 2019-10-22 14:18:44
  */
 import App, { Container } from "next/app";
 import { Provider } from "react-redux";
-import "antd/dist/antd.css";
 import Router from "next/router";
 import withRedux from "../lib/withRedux";
 import Layout from "../components/Layout";
 import PageLoading from "../components/PageLoading";
+import "antd/dist/antd.css";
 
 class MyApp extends App {
   state = {

@@ -1,10 +1,10 @@
 import { useState, useCallback } from "react";
 import { connect } from "react-redux";
 import { Layout, Icon, Input, Avatar, Tooltip, Dropdown, Menu } from "antd";
-import Container from "./Container";
-import { logout } from "../store/store";
 import { withRouter } from "next/router";
 import Link from "next/link";
+import Container from "./Container";
+import { logout } from "../store/store";
 
 const { Header, Content, Footer } = Layout;
 
@@ -20,7 +20,7 @@ const footerStyle = {
   textAlign: "center"
 };
 
-function MyLayout({ children, user, logout, router }) {
+const MyLayout = ({ children, user, logout, router }) => {
   const urlQuery = router.query && router.query.query;
   const [search, setSearch] = useState(urlQuery || "");
   const handleSearchChange = useCallback(
@@ -121,7 +121,7 @@ function MyLayout({ children, user, logout, router }) {
       </style>
     </Layout>
   );
-}
+};
 export default connect(
   function mapStateToProps(state) {
     return {

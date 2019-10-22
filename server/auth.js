@@ -4,12 +4,10 @@
  * @Author: jimmiezhou
  * @Date: 2019-10-16 15:10:02
  * @LastEditors: jimmiezhou
- * @LastEditTime: 2019-10-17 15:35:42
+ * @LastEditTime: 2019-10-22 14:19:42
  */
 const axios = require("axios");
-
 const config = require("../config");
-
 const { client_id, client_secret, request_token_url } = config.github;
 
 module.exports = server => {
@@ -68,6 +66,9 @@ module.exports = server => {
       await next();
     }
   });
+  /**
+   * 不管处于任何页面登录成功都应该返回该页面
+   */
   server.use(async (ctx, next) => {
     const { path, method } = ctx;
     if (path === "/prepare-auth" && method === "GET") {

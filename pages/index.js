@@ -4,14 +4,13 @@
  * @Author: jimmiezhou
  * @Date: 2019-10-16 17:23:47
  * @LastEditors: jimmiezhou
- * @LastEditTime: 2019-10-21 14:51:47
+ * @LastEditTime: 2019-10-22 14:19:08
  */
 import { useEffect } from "react";
 import { Button, Icon, Tabs } from "antd";
 import getCofnig from "next/config";
 import { connect } from "react-redux";
 import Router, { withRouter } from "next/router";
-
 import Repo from "../components/Repo";
 import { cacheArray } from "../lib/repo-basic-cache.js";
 

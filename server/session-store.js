@@ -4,11 +4,11 @@
  * @Author: jimmiezhou
  * @Date: 2019-10-16 15:09:10
  * @LastEditors: jimmiezhou
- * @LastEditTime: 2019-10-16 16:09:28
+ * @LastEditTime: 2019-10-22 14:20:09
  */
-function getRedisSessionId(sid) {
+const getRedisSessionId = sid => {
   return `ssid:${sid}`;
-}
+};
 
 class RedisSessionStore {
   constructor(redis) {

@@ -4,19 +4,18 @@
  * @Author: jimmiezhou
  * @Date: 2019-10-17 14:43:27
  * @LastEditors: jimmiezhou
- * @LastEditTime: 2019-10-21 17:01:39
+ * @LastEditTime: 2019-10-22 14:18:24
  */
 
 import dynamic from "next/dynamic";
-
 import withRepoBasic from "../../components/with-repo-basic";
 import api from "../../lib/api";
 
 const MDRenderer = dynamic(() => import("../../components/MarkdownRenderer"));
 
-function Detail({ readme }) {
+const Detail = ({ readme }) => {
   return <MDRenderer content={readme.content} isBase64={true} />;
-}
+};
 
 Detail.getInitialProps = async ({
   ctx: {

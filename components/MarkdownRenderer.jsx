@@ -8,9 +8,9 @@ const md = new MarkdownIt({
   linkify: true
 });
 
-function b64_to_utf8(str) {
+const b64_to_utf8 = str => {
   return decodeURIComponent(escape(atob(str)));
-}
+};
 
 export default memo(function MarkdownRenderer({ content, isBase64 }) {
   const markdown = isBase64 ? b64_to_utf8(content) : content;
