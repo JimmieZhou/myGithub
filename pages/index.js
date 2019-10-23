@@ -4,13 +4,13 @@
  * @Author: jimmiezhou
  * @Date: 2019-10-16 17:23:47
  * @LastEditors: jimmiezhou
- * @LastEditTime: 2019-10-22 14:19:08
+ * @LastEditTime: 2019-10-23 09:53:49
  */
 import { useEffect } from "react";
 import { Button, Icon, Tabs } from "antd";
 import getCofnig from "next/config";
-import { connect } from "react-redux";
 import Router, { withRouter } from "next/router";
+import { connect } from "react-redux";
 import Repo from "../components/Repo";
 import { cacheArray } from "../lib/repo-basic-cache.js";
 
@@ -37,6 +37,11 @@ const Index = ({ userRepos, userStaredRepos, user, router }) => {
         cachedUserRepos = null;
         cachedUserStaredRepos = null;
       }, 1000 * 60 * 10);
+      return () => {
+        if (timeout) {
+          clearTimeout(timeout);
+        }
+      };
     }
   }, [userRepos, userStaredRepos]);
 
@@ -76,7 +81,7 @@ const Index = ({ userRepos, userStaredRepos, user, router }) => {
         <span className="bio">{user.bio}</span>
         <p className="email">
           <Icon type="mail" style={{ marginRight: 10 }} />
-          <a href={`mailto:${user.email}`}>{user.email}</a>
+          <a href={`mailto:${user.blog}`}>{user.blog}</a>
         </p>
       </div>
       <div className="user-repos">
@@ -122,6 +127,7 @@ const Index = ({ userRepos, userStaredRepos, user, router }) => {
         .avatar {
           width: 100%;
           border-radius: 5px;
+          border: 1px solid #eee;
         }
         .user-repos {
           flex-grow: 1;

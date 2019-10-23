@@ -4,9 +4,8 @@
  * @Author: jimmiezhou
  * @Date: 2019-10-17 16:48:10
  * @LastEditors: jimmiezhou
- * @LastEditTime: 2019-10-21 16:31:33
+ * @LastEditTime: 2019-10-22 15:07:39
  */
-const axios = require("axios");
 const { requestGithub } = require("../lib/api");
 module.exports = server => {
   server.use(async (ctx, next) => {
@@ -14,7 +13,6 @@ module.exports = server => {
     const method = ctx.method
 
     if (path.startsWith('/github/')) {
-      console.log(ctx.request.body)
       const session = ctx.session
       const githubAuth = session && session.githubAuth
       const headers = {}
