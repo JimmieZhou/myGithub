@@ -4,49 +4,62 @@
  * @Author: jimmiezhou
  * @Date: 2019-10-16 17:23:47
  * @LastEditors: jimmiezhou
- * @LastEditTime: 2019-10-23 14:48:26
+ * @LastEditTime: 2019-10-23 15:28:31
  */
-import { useEffect } from "react";
-import { Button, Icon, Tabs } from "antd";
-import getCofnig from "next/config";
-import { connect } from "react-redux";
-import Router, { withRouter } from "next/router";
+import { useEffect } from 'react'
+import { Button, Icon, Tabs } from 'antd'
+import getCofnig from 'next/config'
+import { connect } from 'react-redux'
+import Router, { withRouter } from 'next/router'
+import LRU from 'lru-cache'
 
-import Repo from "../components/Repo";
-import { cacheArray } from "../lib/repo-basic-cache";
+import Repo from '../components/Repo'
+import { cacheArray } from '../lib/repo-basic-cache'
 
-const api = require("../lib/api");
+const api = require('../lib/api')
 
-const { publicRuntimeConfig } = getCofnig();
+// const cache = new LRU({
+//   maxAge: 1000 * 10,
+// })
 
-let cachedUserRepos, cachedUserStaredRepos;
+const { publicRuntimeConfig } = getCofnig()
 
-const isServer = typeof window === "undefined";
+let cachedUserRepos, cachedUserStaredRepos
+
+const isServer = typeof window === 'undefined'
 
 function Index({ userRepos, userStaredRepos, user, router }) {
-  const tabKey = router.query.key || "1";
+  // console.log(userRepos, userStaredRepos)
+
+  const tabKey = router.query.key || '1'
 
   const handleTabChange = activeKey => {
-    Router.push(`/?key=${activeKey}`);
-  };
+    Router.push(`/?key=${activeKey}`)
+  }
 
   useEffect(() => {
     if (!isServer) {
-      cachedUserRepos = userRepos;
-      cachedUserStaredRepos = userStaredRepos;
+      cachedUserRepos = userRepos
+      cachedUserStaredRepos = userStaredRepos
+      // if (userRepos) {
+      //   cache.set('userRepos', userRepos)
+      // }
+      // if (userStaredRepos) {
+      //   cache.set('userStaredRepos', userStaredRepos)
+      // }
       const timeout = setTimeout(() => {
-        cachedUserRepos = null;
-        cachedUserStaredRepos = null;
-      }, 1000 * 60 * 10);
+        cachedUserRepos = null
+        cachedUserStaredRepos = null
+      }, 1000 * 60 * 10)
     }
-  }, [userRepos, userStaredRepos]);
+  }, [userRepos, userStaredRepos])
 
   useEffect(() => {
     if (!isServer) {
-      cacheArray(userRepos);
-      cacheArray(userStaredRepos);
+      cacheArray(userRepos)
+      cacheArray(userStaredRepos)
     }
-  });
+  })
 
   if (!user || !user.id) {
     return (
@@ -65,7 +78,7 @@ function Index({ userRepos, userStaredRepos, user, router }) {
           }
         `}</style>
       </div>
-    );
+    )
   }
 
   return (
@@ -81,6 +94,9 @@ function Index({ userRepos, userStaredRepos, user, router }) {
         </p>
       </div>
       <div className="user-repos">
+        {/* {userRepos.map(repo => (
+          <Repo repo={repo} />
+        ))} */}
         <Tabs activeKey={tabKey} onChange={handleTabChange} animated={false}>
           <Tabs.TabPane tab="你的仓库" key="1">
             {userRepos.map(repo => (
@@ -129,54 +145,66 @@ function Index({ userRepos, userStaredRepos, user, router }) {
         }
       `}</style>
     </div>
-  );
+  )
 }
 
 Index.getInitialProps = async ({ ctx, reduxStore }) => {
-  const user = reduxStore.getState().user;
-  console.log(reduxStore);
+  // const result = await axios
+  //   .get('/github/search/repositories?q=react')
+  //   .then(resp => console.log(resp))
+
+  const user = reduxStore.getState().user
+  console.log(reduxStore)
   if (!user || !user.id) {
     return {
-      isLogin: false
-    };
+      isLogin: false,
+    }
   }
 
   if (!isServer) {
+    // if (cache.get('userRepos') && cache.get('userStaredRepos')) {
+    //   return {
+    //     userRepos: cache.get('userRepos'),
+    //     userStaredRepos: cache.get('userStaredRepos'),
+    //   }
+    // }
+
     if (cachedUserRepos && cachedUserStaredRepos) {
       return {
         userRepos: cachedUserRepos,
-        userStaredRepos: cachedUserStaredRepos
-      };
+        userStaredRepos: cachedUserStaredRepos,
+      }
     }
   }
 
   const userRepos = await api.request(
     {
-      url: "/user/repos"
+      url: '/user/repos',
     },
     ctx.req,
-    ctx.res
-  );
+    ctx.res,
+  )
 
   const userStaredRepos = await api.request(
     {
-      url: "/user/starred"
+      url: '/user/starred',
     },
     ctx.req,
-    ctx.res
-  );
+    ctx.res,
+  )
 
   return {
     isLogin: true,
     userRepos: userRepos.data,
-    userStaredRepos: userStaredRepos.data
-  };
-};
+    userStaredRepos: userStaredRepos.data,
+  }
+}
 
 export default withRouter(
   connect(function mapState(state) {
     return {
-      user: state.user
-    };
-  })(Index)
-);
+      user: state.user,
+    }
+  })(Index),
+)
+

@@ -4,44 +4,17 @@
  * @Author: jimmiezhou
  * @Date: 2019-10-17 17:20:52
  * @LastEditors: jimmiezhou
- * @LastEditTime: 2019-10-23 14:45:14
+ * @LastEditTime: 2019-10-23 15:39:49
  */
 import { memo, isValidElement, useEffect } from "react";
 import { withRouter } from "next/router";
 import { Row, Col, List, Pagination } from "antd";
 import Link from "next/link";
-
 import Repo from "../../components/Repo";
 import { cacheArray } from "../../lib/repo-basic-cache";
+import { LANGUAGES, SORT_TYPES } from "./static";
 
 const api = require("../../lib/api");
-
-const LANGUAGES = ["JavaScript", "HTML", "CSS", "TypeScript", "Java", "Rust"];
-const SORT_TYPES = [
-  {
-    name: "Best Match"
-  },
-  {
-    name: "Most Stars",
-    value: "stars",
-    order: "desc"
-  },
-  {
-    name: "Fewest Stars",
-    value: "stars",
-    order: "asc"
-  },
-  {
-    name: "Most Forks",
-    value: "forks",
-    order: "desc"
-  },
-  {
-    name: "Fewest Forks",
-    value: "forks",
-    order: "asc"
-  }
-];
 
 /**
  * sort: 排序方式

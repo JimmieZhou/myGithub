@@ -4,63 +4,66 @@
  * @Author: jimmiezhou
  * @Date: 2019-10-14 11:19:38
  * @LastEditors: jimmiezhou
- * @LastEditTime: 2019-10-23 14:47:11
+ * @LastEditTime: 2019-10-23 15:28:12
  */
-import App, { Container } from "next/app";
-import { Provider } from "react-redux";
-import Router from "next/router";
+import App, { Container } from 'next/app'
+import { Provider } from 'react-redux'
+import Router from 'next/router'
+import Link from 'next/link'
 
-import "antd/dist/antd.css";
+import axios from 'axios'
 
-import Layout from "../components/Layout";
-import PageLoading from "../components/PageLoading";
+import 'antd/dist/antd.css'
 
-import testHoc from "../lib/withRedux";
+import Layout from '../components/Layout'
+import PageLoading from '../components/PageLoading'
+
+import testHoc from '../lib/withRedux'
 
 class MyApp extends App {
   state = {
-    context: "value",
-    loading: false
-  };
+    context: 'value',
+    loading: false,
+  }
 
   startLoading = () => {
     this.setState({
-      loading: true
-    });
-  };
+      loading: true,
+    })
+  }
 
   stopLoading = () => {
     this.setState({
-      loading: false
-    });
-  };
+      loading: false,
+    })
+  }
 
   componentDidMount() {
-    Router.events.on("routeChangeStart", this.startLoading);
-    Router.events.on("routeChangeComplete", this.stopLoading);
-    Router.events.on("routeChangeError", this.stopLoading);
+    Router.events.on('routeChangeStart', this.startLoading)
+    Router.events.on('routeChangeComplete', this.stopLoading)
+    Router.events.on('routeChangeError', this.stopLoading)
   }
 
   componentWillUnmount() {
-    Router.events.off("routeChangeStart", this.startLoading);
-    Router.events.off("routeChangeComplete", this.stopLoading);
-    Router.events.off("routeChangeError", this.stopLoading);
+    Router.events.off('routeChangeStart', this.startLoading)
+    Router.events.off('routeChangeComplete', this.stopLoading)
+    Router.events.off('routeChangeError', this.stopLoading)
   }
 
   static async getInitialProps(ctx) {
-    const { Component } = ctx;
-    console.log("app init");
-    let pageProps = {};
+    const { Component } = ctx
+    console.log('app init')
+    let pageProps = {}
     if (Component.getInitialProps) {
-      pageProps = await Component.getInitialProps(ctx);
+      pageProps = await Component.getInitialProps(ctx)
     }
     return {
-      pageProps
-    };
+      pageProps,
+    }
   }
 
   render() {
-    const { Component, pageProps, reduxStore } = this.props;
+    const { Component, pageProps, reduxStore } = this.props
 
     return (
       <Container>
@@ -71,8 +74,8 @@ class MyApp extends App {
           </Layout>
         </Provider>
       </Container>
-    );
+    )
   }
 }
 
-export default testHoc(MyApp);
+export default testHoc(MyApp)

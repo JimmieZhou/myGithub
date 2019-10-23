@@ -4,11 +4,13 @@
  * @Author: jimmiezhou
  * @Date: 2019-10-14 11:06:20
  * @LastEditors: jimmiezhou
- * @LastEditTime: 2019-10-23 14:56:13
+ * @LastEditTime: 2019-10-23 15:21:27
  */
 
 // next支持使用css
 const withCss = require("@zeit/next-css");
+const webpack = require("webpack");
+const withBundleAnalyzer = require("@zeit/next-bundle-analyzer");
 const config = require("./config");
 
 const configs = {
@@ -62,9 +64,26 @@ if (typeof require !== "undefined") {
   require.extensions[".css"] = file => {};
 }
 
-module.exports = withCss({
-  publicRuntimeConfig: {
-    GITHUB_OAUTH_URL: config.GITHUB_OAUTH_URL,
-    OAUTH_URL: config.OAUTH_URL
-  }
-});
+module.exports = withBundleAnalyzer(
+  withCss({
+    webpack(config) {
+      config.plugins.push(new webpack.IgnorePlugin(/^\.\/locale$/, /moment$/));
+      return config;
+    },
+    publicRuntimeConfig: {
+      GITHUB_OAUTH_URL: config.GITHUB_OAUTH_URL,
+      OAUTH_URL: config.OAUTH_URL
+    },
+    analyzeBrowser: ["browser", "both"].includes(process.env.BUNDLE_ANALYZE),
+    bundleAnalyzerConfig: {
+      server: {
+        analyzerMode: "static",
+        reportFilename: "../bundles/server.html"
+      },
+      browser: {
+        analyzerMode: "static",
+        reportFilename: "../bundles/client.html"
+      }
+    }
+  })
+);

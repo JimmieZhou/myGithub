@@ -4,7 +4,7 @@
  * @Author: jimmiezhou
  * @Date: 2019-10-15 11:41:08
  * @LastEditors: jimmiezhou
- * @LastEditTime: 2019-10-23 15:01:22
+ * @LastEditTime: 2019-10-23 15:40:45
  */
 import { createStore, applyMiddleware } from "redux";
 import ReduxThunk from "redux-thunk";
@@ -15,7 +15,6 @@ import { LOGOUT } from "../constant/userConstant";
 
 const userInitialState = {};
 
-// action creators
 export function logout() {
   return dispatch => {
     axios
@@ -47,5 +46,6 @@ export default function initializeStore(state) {
     ),
     composeWithDevTools(applyMiddleware(ReduxThunk))
   );
+
   return store;
 }

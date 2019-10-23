@@ -1,4 +1,4 @@
-import { Spin } from "antd";
+import { Spin } from 'antd'
 
 export default () => (
   <div className="root">
@@ -18,4 +18,4 @@ export default () => (
       }
     `}</style>
   </div>
-);
+)
