@@ -4,17 +4,16 @@
  * @Author: jimmiezhou
  * @Date: 2019-10-16 15:10:02
  * @LastEditors: jimmiezhou
- * @LastEditTime: 2019-10-22 14:19:42
+ * @LastEditTime: 2019-10-23 14:50:45
  */
 const axios = require("axios");
+
 const config = require("../config");
+
 const { client_id, client_secret, request_token_url } = config.github;
 
 module.exports = server => {
   server.use(async (ctx, next) => {
-    // doc: https://developer.github.com/apps/building-oauth-apps/authorizing-oauth-apps/
-    // 这里https://github.com/login/oauth/authorize？client_id=b50f64b8e843c7f47137,请求后会跳转到
-    // http://localhost:3000/auth?code=57f71043c9cc20586f75
     if (ctx.path === "/auth") {
       const code = ctx.query.code;
       if (!code) {
@@ -34,6 +33,8 @@ module.exports = server => {
         }
       });
 
+      console.log(result.status, result.data);
+
       if (result.status === 200 && (result.data && !result.data.error)) {
         ctx.session.githubAuth = result.data;
 
@@ -46,7 +47,10 @@ module.exports = server => {
             Authorization: `${token_type} ${access_token}`
           }
         });
+
+        // console.log(userInfoResp.data)
         ctx.session.userInfo = userInfoResp.data;
+
         ctx.redirect((ctx.session && ctx.session.urlBeforeOAuth) || "/");
         ctx.session.urlBeforeOAuth = "";
       } else {
@@ -57,23 +61,27 @@ module.exports = server => {
       await next();
     }
   });
+
   server.use(async (ctx, next) => {
-    const { path, method } = ctx;
+    const path = ctx.path;
+    const method = ctx.method;
     if (path === "/logout" && method === "POST") {
       ctx.session = null;
-      ctx.body = "logout success";
+      ctx.body = `logout success`;
     } else {
       await next();
     }
   });
-  /**
-   * 不管处于任何页面登录成功都应该返回该页面
-   */
+
   server.use(async (ctx, next) => {
-    const { path, method } = ctx;
+    const path = ctx.path;
+    const method = ctx.method;
     if (path === "/prepare-auth" && method === "GET") {
+      // ctx.session = null
+      // ctx.body = `logout success`
       const { url } = ctx.query;
       ctx.session.urlBeforeOAuth = url;
+      // ctx.body = 'ready'
       ctx.redirect(config.OAUTH_URL);
     } else {
       await next();

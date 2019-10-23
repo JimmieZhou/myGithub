@@ -1,15 +1,31 @@
 import { useState, useCallback } from "react";
+import getCofnig from "next/config";
 import { connect } from "react-redux";
-import { Layout, Icon, Input, Avatar, Tooltip, Dropdown, Menu } from "antd";
 import { withRouter } from "next/router";
+
+import axios from "axios";
+
 import Link from "next/link";
+import {
+  Layout,
+  Icon,
+  Input,
+  Avatar,
+  Tooltip,
+  Dropdown,
+  Menu
+} from "antd";
+
 import Container from "./Container";
+
 import { logout } from "../store/store";
 
 const { Header, Content, Footer } = Layout;
 
+const { publicRuntimeConfig } = getCofnig();
+
 const githubIconStyle = {
-  color: "#fff",
+  color: "white",
   fontSize: 40,
   display: "block",
   paddingTop: 10,
@@ -20,34 +36,52 @@ const footerStyle = {
   textAlign: "center"
 };
 
-const MyLayout = ({ children, user, logout, router }) => {
+function MyLayout({ children, user, logout, router }) {
   const urlQuery = router.query && router.query.query;
+
   const [search, setSearch] = useState(urlQuery || "");
+
   const handleSearchChange = useCallback(
     event => {
       setSearch(event.target.value);
     },
     [setSearch]
   );
-  const handleOnsearch = useCallback(() => {
+
+  const handleOnSearch = useCallback(() => {
     router.push(`/search?query=${search}`);
   }, [search]);
 
-  const handelLogout = useCallback(
-    e => {
-      e.preventDefault();
-      logout();
-    },
-    [logout]
-  );
+  const handleLogout = useCallback(() => {
+    logout();
+  }, [logout]);
 
-  const userDropDown = () => (
+  const handleGotoOAuth = useCallback(e => {
+    e.preventDefault();
+    axios
+      .get(`/prepare-auth?url=${router.asPath}`)
+      .then(resp => {
+        if (resp.status === 200) {
+          location.href = publicRuntimeConfig.OAUTH_URL;
+        } else {
+          console.log("prepare auth failed", resp);
+        }
+      })
+      .catch(err => {
+        console.log("prepare auth failed", err);
+      });
+  }, []);
+
+  const userDropDown = (
     <Menu>
       <Menu.Item>
-        <a onClick={handelLogout}>登出</a>
+        <a href="javascript:void(0)" onClick={handleLogout}>
+          登 出
+        </a>
       </Menu.Item>
     </Menu>
   );
+
   return (
     <Layout>
       <Header>
@@ -63,7 +97,7 @@ const MyLayout = ({ children, user, logout, router }) => {
                 placeholder="搜索仓库"
                 value={search}
                 onChange={handleSearchChange}
-                onSearch={handleOnsearch}
+                onSearch={handleOnSearch}
               />
             </div>
           </div>
@@ -72,13 +106,13 @@ const MyLayout = ({ children, user, logout, router }) => {
               {user && user.id ? (
                 <Dropdown overlay={userDropDown}>
                   <a href="/">
-                    <Avatar size="40" src={user.avatar_url} />
+                    <Avatar size={40} src={user.avatar_url} />
                   </a>
                 </Dropdown>
               ) : (
                 <Tooltip title="点击进行登录">
                   <a href={`/prepare-auth?url=${router.asPath}`}>
-                    <Avatar size="40" icon="user" />
+                    <Avatar size={40} icon="user" />
                   </a>
                 </Tooltip>
               )}
@@ -89,48 +123,51 @@ const MyLayout = ({ children, user, logout, router }) => {
       <Content>
         <Container>{children}</Container>
       </Content>
-      <Footer style={footerStyle}>Develop by JimmieZhou</Footer>
-      <style jsx>
-        {`
-          .header-inner {
-            display: flex;
-            justify-content: space-between;
-          }
-          .header-left {
-            display: flex;
-            justify-content: flex-start;
-          }
-        `}
-      </style>
-      <style jsx global>
-        {`
-          #__next {
-            height: 100%;
-          }
-          .ant-layout {
-            min-height: 100%;
-          }
-          .ant-layout-header {
-            padding-left: 0;
-            padding-right: 0;
-          }
-          .ant-layout-content {
-            background: #fff;
-          }
-        `}
-      </style>
+      <Footer style={footerStyle}>
+        Develop by Jokcy @
+        <a href="mailto:jokcy@hotmail.com">jokcy@hotmail.com</a>
+      </Footer>
+      <style jsx>{`
+        .content {
+          color: red;
+        }
+        .header-inner {
+          display: flex;
+          justify-content: space-between;
+        }
+        .header-left {
+          display: flex;
+          justify-content: flex-start;
+        }
+      `}</style>
+      <style jsx global>{`
+        #__next {
+          height: 100%;
+        }
+        .ant-layout {
+          min-height: 100%;
+        }
+        .ant-layout-header {
+          padding-left: 0;
+          padding-right: 0;
+        }
+        .ant-layout-content {
+          background: #fff;
+        }
+      `}</style>
     </Layout>
   );
-};
+}
+
 export default connect(
-  function mapStateToProps(state) {
+  function mapState(state) {
     return {
       user: state.user
     };
   },
-  function mapDispatchToProps(dispath) {
+  function mapReducer(dispatch) {
     return {
-      logout: () => dispath(logout())
+      logout: () => dispatch(logout())
     };
   }
 )(withRouter(MyLayout));

@@ -1,7 +1,8 @@
 import { useEffect } from "react";
+import Repo from "./Repo";
 import Link from "next/link";
 import { withRouter } from "next/router";
-import Repo from "./Repo";
+
 import api from "../lib/api";
 import { get, cache } from "../lib/repo-basic-cache";
 

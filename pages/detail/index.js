@@ -4,18 +4,19 @@
  * @Author: jimmiezhou
  * @Date: 2019-10-17 14:43:27
  * @LastEditors: jimmiezhou
- * @LastEditTime: 2019-10-22 14:18:24
+ * @LastEditTime: 2019-10-23 14:43:20
  */
 
 import dynamic from "next/dynamic";
+
 import withRepoBasic from "../../components/with-repo-basic";
 import api from "../../lib/api";
 
 const MDRenderer = dynamic(() => import("../../components/MarkdownRenderer"));
 
-const Detail = ({ readme }) => {
+function Detail({ readme }) {
   return <MDRenderer content={readme.content} isBase64={true} />;
-};
+}
 
 Detail.getInitialProps = async ({
   ctx: {
@@ -24,6 +25,8 @@ Detail.getInitialProps = async ({
     res
   }
 }) => {
+  // console.log('detail getInitialProps invoked')
+
   const readmeResp = await api.request(
     {
       url: `/repos/${owner}/${name}/readme`

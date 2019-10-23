@@ -4,15 +4,18 @@
  * @Author: jimmiezhou
  * @Date: 2019-10-14 11:19:38
  * @LastEditors: jimmiezhou
- * @LastEditTime: 2019-10-22 14:18:44
+ * @LastEditTime: 2019-10-23 14:47:11
  */
 import App, { Container } from "next/app";
 import { Provider } from "react-redux";
 import Router from "next/router";
-import withRedux from "../lib/withRedux";
+
+import "antd/dist/antd.css";
+
 import Layout from "../components/Layout";
 import PageLoading from "../components/PageLoading";
-import "antd/dist/antd.css";
+
+import testHoc from "../lib/withRedux";
 
 class MyApp extends App {
   state = {
@@ -36,7 +39,6 @@ class MyApp extends App {
     Router.events.on("routeChangeStart", this.startLoading);
     Router.events.on("routeChangeComplete", this.stopLoading);
     Router.events.on("routeChangeError", this.stopLoading);
-    
   }
 
   componentWillUnmount() {
@@ -59,11 +61,11 @@ class MyApp extends App {
 
   render() {
     const { Component, pageProps, reduxStore } = this.props;
-    const { loading } = this.state;
+
     return (
       <Container>
         <Provider store={reduxStore}>
-          {loading ? <PageLoading /> : null}
+          {this.state.loading ? <PageLoading /> : null}
           <Layout>
             <Component {...pageProps} />
           </Layout>
@@ -73,4 +75,4 @@ class MyApp extends App {
   }
 }
 
-export default withRedux(MyApp);
+export default testHoc(MyApp);

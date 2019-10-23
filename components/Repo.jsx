@@ -1,10 +1,11 @@
 import Link from "next/link";
 import { Icon } from "antd";
+
 import { getLastUpdated } from "../lib/utils";
 
-const getLicense = license => {
+function getLicense(license) {
   return license ? `${license.spdx_id} license` : "";
-};
+}
 
 export default ({ repo }) => {
   return (

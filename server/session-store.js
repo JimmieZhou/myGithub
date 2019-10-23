@@ -4,22 +4,22 @@
  * @Author: jimmiezhou
  * @Date: 2019-10-16 15:09:10
  * @LastEditors: jimmiezhou
- * @LastEditTime: 2019-10-22 14:20:09
+ * @LastEditTime: 2019-10-23 14:51:26
  */
-const getRedisSessionId = sid => {
+function getRedisSessionId(sid) {
   return `ssid:${sid}`;
-};
+}
 
 class RedisSessionStore {
-  constructor(redis) {
-    this.redis = redis;
+  constructor(client) {
+    this.client = client;
   }
 
   //获取Redis中存储的session数据
   async get(sid) {
     console.log("get session", sid);
     const id = getRedisSessionId(sid);
-    const data = await this.redis.get(id);
+    const data = await this.client.get(id);
     if (!data) {
       return null;
     }
@@ -41,9 +41,9 @@ class RedisSessionStore {
     try {
       const sessStr = JSON.stringify(sess);
       if (ttl) {
-        await this.redis.setex(id, ttl, sessStr);
+        await this.client.setex(id, ttl, sessStr);
       } else {
-        await this.redis.set(id, sessStr);
+        await this.client.set(id, sessStr);
       }
     } catch (err) {
       console.error(err);
@@ -54,7 +54,7 @@ class RedisSessionStore {
   async destroy(sid) {
     console.log("destroy session", sid);
     const id = getRedisSessionId(sid);
-    await this.redis.del(id);
+    await this.client.del(id);
   }
 }
 
