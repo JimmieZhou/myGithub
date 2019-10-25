@@ -4,7 +4,7 @@
  * @Author: jimmiezhou
  * @Date: 2019-10-23 11:27:52
  * @LastEditors: jimmiezhou
- * @LastEditTime: 2019-10-25 17:24:19
+ * @LastEditTime: 2019-10-25 17:36:11
  */
 import { useState, useCallback, useEffect } from "react";
 import { Avatar, Button, Select, Spin } from "antd";
@@ -18,7 +18,7 @@ const MdRenderer = dynamic(() => import("../../components/MarkdownRenderer"));
 
 const CACHE = {};
 
-function IssueDetail({ issue }) {
+const IssueDetail = ({ issue }) => {
   return (
     <div className="root">
       <MdRenderer content={issue.body} />
@@ -38,9 +38,9 @@ function IssueDetail({ issue }) {
       `}</style>
     </div>
   );
-}
+};
 
-function IssueItem({ issue }) {
+const IssueItem = ({ issue }) => {
   const [showDetail, setShowDetail] = useState(false);
 
   const toggleShowDetail = useCallback(() => {
@@ -105,9 +105,9 @@ function IssueItem({ issue }) {
       {showDetail ? <IssueDetail issue={issue} /> : null}
     </div>
   );
-}
+};
 
-function makeQuery(creator, state, labels) {
+const makeQuery = (creator, state, labels) => {
   let creatorStr = creator ? `creator=${creator}` : "";
   let stateStr = state ? `state=${state}` : "";
   let labelStr = "";
@@ -122,7 +122,7 @@ function makeQuery(creator, state, labels) {
   if (labelStr) arr.push(labelStr);
 
   return `?${arr.join("&")}`;
-}
+};
 
 function Label({ label }) {
   return (
@@ -148,7 +148,7 @@ const Option = Select.Option;
 /**
  * TODO: 在标题上显示label！！！！！
  */
-function Issues({ initialIssues, labels, owner, name }) {
+const Issues = ({ initialIssues, labels, owner, name }) => {
   const [creator, setCreator] = useState();
   const [state, setState] = useState();
   const [label, setLabel] = useState([]);
@@ -174,7 +174,6 @@ function Issues({ initialIssues, labels, owner, name }) {
   }, []);
 
   const handleSearch = useCallback(() => {
-    // search
     setFetching(true);
     api
       .request({
@@ -251,7 +250,7 @@ function Issues({ initialIssues, labels, owner, name }) {
       `}</style>
     </div>
   );
-}
+};
 
 Issues.getInitialProps = async ({ ctx }) => {
   console.log("----issue", Date.now());
@@ -279,7 +278,7 @@ Issues.getInitialProps = async ({ ctx }) => {
           ctx.res
         )
   ]);
-  
+
   return {
     owner,
     name,

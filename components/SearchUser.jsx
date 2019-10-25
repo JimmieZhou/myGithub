@@ -7,7 +7,6 @@ import api from "../lib/api";
 const Option = Select.Option;
 
 const SearchUser = ({ onChange, value }) => {
-  // { current: 0 }
   const lastFetchIdRef = useRef(0);
   const [fetching, setFetching] = useState(false);
   const [options, setOptions] = useState([]);
