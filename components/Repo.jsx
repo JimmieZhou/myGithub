@@ -1,11 +1,10 @@
-import Link from 'next/link'
-import { Icon } from 'antd'
+import Link from "next/link";
+import { Icon } from "antd";
+import { getLastUpdated } from "../lib/utils";
 
-import { getLastUpdated } from '../lib/utils'
-
-function getLicense(license) {
-  return license ? `${license.spdx_id} license` : ''
-}
+const getLicense = license => {
+  return license ? `${license.spdx_id} license` : "";
+};
 
 export default ({ repo }) => {
   return (
@@ -62,5 +61,5 @@ export default ({ repo }) => {
         }
       `}</style>
     </div>
-  )
-}
+  );
+};

@@ -4,7 +4,7 @@
  * @Author: jimmiezhou
  * @Date: 2019-10-16 17:23:47
  * @LastEditors: jimmiezhou
- * @LastEditTime: 2019-10-25 16:04:50
+ * @LastEditTime: 2019-10-25 16:27:30
  */
 import { useEffect } from "react";
 import { Button, Icon, Tabs } from "antd";
@@ -19,6 +19,7 @@ const api = require("../lib/api");
 
 const { publicRuntimeConfig } = getCofnig();
 
+// 缓存数据
 let cachedUserRepos, cachedUserStaredRepos;
 
 const Index = ({ userRepos, userStaredRepos, user, router }) => {

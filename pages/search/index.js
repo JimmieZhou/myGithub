@@ -4,7 +4,7 @@
  * @Author: jimmiezhou
  * @Date: 2019-10-17 17:20:52
  * @LastEditors: jimmiezhou
- * @LastEditTime: 2019-10-25 15:33:18
+ * @LastEditTime: 2019-10-25 16:50:09
  */
 import { memo, isValidElement, useEffect } from "react";
 import { withRouter } from "next/router";
@@ -17,19 +17,10 @@ import { isServer } from "../../lib/utils";
 
 const api = require("../../lib/api");
 
-/**
- * sort: 排序方式
- * order: 排序顺序
- * lang: 仓库的项目开发主语言
- * page：分页页面
- */
-
 const selectedItemStyle = {
   borderLeft: "2px solid #e36209",
   fontWeight: 100
 };
-
-function noop() {}
 
 const per_page = 20;
 
@@ -48,7 +39,7 @@ const FilterLink = memo(({ name, query, lang, sort, order, page }) => {
   );
 });
 
-function Search({ router, repos }) {
+const Search = ({ router, repos }) => {
   const { ...querys } = router.query;
   const { lang, sort, order, page } = router.query;
 
@@ -118,7 +109,7 @@ function Search({ router, repos }) {
                 pageSize={per_page}
                 current={Number(page) || 1}
                 total={1000}
-                onChange={noop}
+                onChange={() => {}}
                 itemRender={(page, type, ol) => {
                   const p =
                     type === "page"
@@ -154,11 +145,22 @@ function Search({ router, repos }) {
       `}</style>
     </div>
   );
-}
+};
+
+const makeQuery = queryObj => {
+  const { query, sort, lang, order, page } = queryObj;
+  // ?q=react+language:javascript&sort=stars&order=desc&page=2
+  let queryString = `?q=${query}`;
+  if (lang) queryString += `+language:${lang}`;
+  if (sort) queryString += `&sort=${sort}&order=${order || "desc"}`;
+  if (page) queryString += `&page=${page}`;
+  queryString += `&per_page=${per_page}`;
+  return queryString;
+};
 
 Search.getInitialProps = async ({ ctx }) => {
-  console.log('----search-getInitialProps',Date.now())
-  const { query, sort, lang, order, page } = ctx.query;
+  console.log("----search-getInitialProps", Date.now());
+  const { query } = ctx.query;
   if (!query) {
     return {
       repos: {
@@ -168,14 +170,7 @@ Search.getInitialProps = async ({ ctx }) => {
     };
   }
 
-  // ?q=react+language:javascript&sort=stars&order=desc&page=2
-
-  let queryString = `?q=${query}`;
-  if (lang) queryString += `+language:${lang}`;
-  if (sort) queryString += `&sort=${sort}&order=${order || "desc"}`;
-  if (page) queryString += `&page=${page}`;
-
-  queryString += `&per_page=${per_page}`;
+  const queryString = makeQuery(ctx.query);
 
   const result = await api.request(
     {

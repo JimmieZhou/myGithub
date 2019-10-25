@@ -4,21 +4,17 @@
  * @Author: jimmiezhou
  * @Date: 2019-10-23 11:27:52
  * @LastEditors: jimmiezhou
- * @LastEditTime: 2019-10-25 16:13:19
+ * @LastEditTime: 2019-10-25 17:24:19
  */
 import { useState, useCallback, useEffect } from "react";
 import { Avatar, Button, Select, Spin } from "antd";
 import dynamic from "next/dynamic";
-
-import { getLastUpdated } from "../../lib/utils";
-
 import withRepoBasic from "../../components/with-repo-basic";
 import SearchUser from "../../components/SearchUser";
-import { isServer } from "../../lib/utils";
+import { getLastUpdated, isServer } from "../../lib/utils";
+import api from "../../lib/api";
 
 const MdRenderer = dynamic(() => import("../../components/MarkdownRenderer"));
-
-import api from "../../lib/api";
 
 const CACHE = {};
 
@@ -185,7 +181,6 @@ function Issues({ initialIssues, labels, owner, name }) {
         url: `/repos/${owner}/${name}/issues${makeQuery(creator, state, label)}`
       })
       .then(resp => {
-        console.log(resp.data);
         setIssues(resp.data);
         setFetching(false);
       })
@@ -284,7 +279,7 @@ Issues.getInitialProps = async ({ ctx }) => {
           ctx.res
         )
   ]);
-
+  
   return {
     owner,
     name,
