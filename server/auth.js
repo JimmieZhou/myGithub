@@ -1,56 +1,37 @@
 /*
- * @Descripttion: 接入github OAuth
+ * @Descripttion: 接入github OAuth流程
  * @version: 1.0.0
  * @Author: jimmiezhou
  * @Date: 2019-10-16 15:10:02
  * @LastEditors: jimmiezhou
- * @LastEditTime: 2019-10-23 15:31:18
+ * @LastEditTime: 2019-10-25 15:26:46
  */
-const axios = require("axios");
-
 const config = require("../config");
-
-const { client_id, client_secret, request_token_url } = config.github;
+const { requestToken, requestGithub } = require("../lib/api");
 
 module.exports = server => {
   server.use(async (ctx, next) => {
+    // 1. 通过client_id 获取到code，同时路由跳转为xxx/auth?code=xxx
     if (ctx.path === "/auth") {
+      console.log('----auth',Date.now())
       const code = ctx.query.code;
       if (!code) {
         ctx.body = "code not exist";
         return;
       }
-      const result = await axios({
-        method: "POST",
-        url: request_token_url,
-        data: {
-          client_id,
-          client_secret,
-          code
-        },
-        headers: {
-          Accept: "application/json"
-        }
-      });
-
-      console.log(result.status, result.data);
+      // 2. 获取token
+      const result = await requestToken(code);
 
       if (result.status === 200 && (result.data && !result.data.error)) {
         ctx.session.githubAuth = result.data;
-
         const { access_token, token_type } = result.data;
-
-        const userInfoResp = await axios({
-          method: "GET",
-          url: "https://api.github.com/user",
-          headers: {
-            Authorization: `${token_type} ${access_token}`
-          }
+        // 3. 请求用户数据
+        const userInfoResp = await requestGithub("GET", "/user", undefined, {
+          Authorization: `${token_type} ${access_token}`
         });
-
-        // console.log(userInfoResp.data)
         ctx.session.userInfo = userInfoResp.data;
 
+        // 保持在任何页面刷新时，都能在当前页面刷新
         ctx.redirect((ctx.session && ctx.session.urlBeforeOAuth) || "/");
         ctx.session.urlBeforeOAuth = "";
       } else {
@@ -63,8 +44,7 @@ module.exports = server => {
   });
 
   server.use(async (ctx, next) => {
-    const path = ctx.path;
-    const method = ctx.method;
+    const { path, method } = ctx;
     if (path === "/logout" && method === "POST") {
       ctx.session = null;
       ctx.body = `logout success`;
@@ -74,14 +54,12 @@ module.exports = server => {
   });
 
   server.use(async (ctx, next) => {
-    const path = ctx.path;
-    const method = ctx.method;
+    const { path, method } = ctx;
     if (path === "/prepare-auth" && method === "GET") {
-      // ctx.session = null
-      // ctx.body = `logout success`
+      console.log('----prepare-auth',Date.now())
       const { url } = ctx.query;
+      // 保持在任何页面刷新时，都能在当前页面刷新
       ctx.session.urlBeforeOAuth = url;
-      // ctx.body = 'ready'
       ctx.redirect(config.OAUTH_URL);
     } else {
       await next();

@@ -4,22 +4,23 @@
  * @Author: jimmiezhou
  * @Date: 2019-10-23 11:27:52
  * @LastEditors: jimmiezhou
- * @LastEditTime: 2019-10-23 15:29:23
+ * @LastEditTime: 2019-10-25 16:13:19
  */
-import { useState, useCallback, useEffect } from 'react'
-import { Avatar, Button, Select, Spin } from 'antd'
-import dynamic from 'next/dynamic'
+import { useState, useCallback, useEffect } from "react";
+import { Avatar, Button, Select, Spin } from "antd";
+import dynamic from "next/dynamic";
 
-import { getLastUpdated } from '../../lib/utils'
+import { getLastUpdated } from "../../lib/utils";
 
-import withRepoBasic from '../../components/with-repo-basic'
-import SearchUser from '../../components/SearchUser'
+import withRepoBasic from "../../components/with-repo-basic";
+import SearchUser from "../../components/SearchUser";
+import { isServer } from "../../lib/utils";
 
-const MdRenderer = dynamic(() => import('../../components/MarkdownRenderer'))
+const MdRenderer = dynamic(() => import("../../components/MarkdownRenderer"));
 
-import api from '../../lib/api'
+import api from "../../lib/api";
 
-const CACHE = {}
+const CACHE = {};
 
 function IssueDetail({ issue }) {
   return (
@@ -40,15 +41,15 @@ function IssueDetail({ issue }) {
         }
       `}</style>
     </div>
-  )
+  );
 }
 
 function IssueItem({ issue }) {
-  const [showDetail, setShowDetail] = useState(false)
+  const [showDetail, setShowDetail] = useState(false);
 
   const toggleShowDetail = useCallback(() => {
-    setShowDetail(detail => !detail)
-  }, [])
+    setShowDetail(detail => !detail);
+  }, []);
 
   return (
     <div>
@@ -56,10 +57,10 @@ function IssueItem({ issue }) {
         <Button
           type="primary"
           size="small"
-          style={{ position: 'absolute', right: 10, top: 10 }}
+          style={{ position: "absolute", right: 10, top: 10 }}
           onClick={toggleShowDetail}
         >
-          {showDetail ? '隐藏' : '查看'}
+          {showDetail ? "隐藏" : "查看"}
         </Button>
         <div className="avatar">
           <Avatar src={issue.user.avatar_url} shape="square" size={50} />
@@ -107,24 +108,24 @@ function IssueItem({ issue }) {
       </div>
       {showDetail ? <IssueDetail issue={issue} /> : null}
     </div>
-  )
+  );
 }
 
 function makeQuery(creator, state, labels) {
-  let creatorStr = creator ? `creator=${creator}` : ''
-  let stateStr = state ? `state=${state}` : ''
-  let labelStr = ''
+  let creatorStr = creator ? `creator=${creator}` : "";
+  let stateStr = state ? `state=${state}` : "";
+  let labelStr = "";
   if (labels && labels.length > 0) {
-    labelStr = `labels=${labels.join(',')}`
+    labelStr = `labels=${labels.join(",")}`;
   }
 
-  const arr = []
+  const arr = [];
 
-  if (creatorStr) arr.push(creatorStr)
-  if (stateStr) arr.push(stateStr)
-  if (labelStr) arr.push(labelStr)
+  if (creatorStr) arr.push(creatorStr);
+  if (stateStr) arr.push(stateStr);
+  if (labelStr) arr.push(labelStr);
 
-  return `?${arr.join('&')}`
+  return `?${arr.join("&")}`;
 }
 
 function Label({ label }) {
@@ -144,61 +145,55 @@ function Label({ label }) {
         }
       `}</style>
     </>
-  )
+  );
 }
 
-const isServer = typeof window === 'undefined'
-
-const Option = Select.Option
+const Option = Select.Option;
 /**
  * TODO: 在标题上显示label！！！！！
  */
 function Issues({ initialIssues, labels, owner, name }) {
-  const [creator, setCreator] = useState()
-  const [state, setState] = useState()
-  const [label, setLabel] = useState([])
-  const [issues, setIssues] = useState(initialIssues)
-  const [fetching, setFetching] = useState(false)
+  const [creator, setCreator] = useState();
+  const [state, setState] = useState();
+  const [label, setLabel] = useState([]);
+  const [issues, setIssues] = useState(initialIssues);
+  const [fetching, setFetching] = useState(false);
 
   useEffect(() => {
     if (!isServer) {
-      CACHE[`${owner}/${name}`] = labels
+      CACHE[`${owner}/${name}`] = labels;
     }
-  }, [owner, name, labels])
+  }, [owner, name, labels]);
 
   const handleCreatorChange = useCallback(value => {
-    setCreator(value)
-  }, [])
+    setCreator(value);
+  }, []);
 
   const handleStateChange = useCallback(value => {
-    setState(value)
-  }, [])
+    setState(value);
+  }, []);
 
   const handleLabelChange = useCallback(value => {
-    setLabel(value)
-  }, [])
+    setLabel(value);
+  }, []);
 
   const handleSearch = useCallback(() => {
     // search
-    setFetching(true)
+    setFetching(true);
     api
       .request({
-        url: `/repos/${owner}/${name}/issues${makeQuery(
-          creator,
-          state,
-          label,
-        )}`,
+        url: `/repos/${owner}/${name}/issues${makeQuery(creator, state, label)}`
       })
       .then(resp => {
-        console.log(resp.data)
-        setIssues(resp.data)
-        setFetching(false)
+        console.log(resp.data);
+        setIssues(resp.data);
+        setFetching(false);
       })
       .catch(err => {
-        console.error(err)
-        setFetching(false)
-      })
-  }, [owner, name, creator, state, label])
+        console.error(err);
+        setFetching(false);
+      });
+  }, [owner, name, creator, state, label]);
 
   return (
     <div className="root">
@@ -260,43 +255,42 @@ function Issues({ initialIssues, labels, owner, name }) {
         }
       `}</style>
     </div>
-  )
+  );
 }
 
 Issues.getInitialProps = async ({ ctx }) => {
-  // console.log('issues getInitialProps invoked')
+  console.log("----issue", Date.now());
 
-  const { owner, name } = ctx.query
+  const { owner, name } = ctx.query;
 
-  const full_name = `${owner}/${name}`
+  const full_name = `${owner}/${name}`;
 
   const fetchs = await Promise.all([
     await api.request(
       {
-        url: `/repos/${owner}/${name}/issues`,
+        url: `/repos/${owner}/${name}/issues`
       },
       ctx.req,
-      ctx.res,
+      ctx.res
     ),
 
     CACHE[full_name]
       ? Promise.resolve({ data: CACHE[full_name] })
       : await api.request(
           {
-            url: `/repos/${owner}/${name}/labels`,
+            url: `/repos/${owner}/${name}/labels`
           },
           ctx.req,
-          ctx.res,
-        ),
-  ])
+          ctx.res
+        )
+  ]);
 
   return {
     owner,
     name,
     initialIssues: fetchs[0].data,
-    labels: fetchs[1].data,
-  }
-}
+    labels: fetchs[1].data
+  };
+};
 
-export default withRepoBasic(Issues, 'issues')
-
+export default withRepoBasic(Issues, "issues");

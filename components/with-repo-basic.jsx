@@ -6,6 +6,8 @@ import { withRouter } from 'next/router'
 import api from '../lib/api'
 import { get, cache } from '../lib/repo-basic-cache'
 
+import {isServer} from '../lib/utils'
+
 function makeQuery(queryObject) {
   const query = Object.entries(queryObject)
     .reduce((result, entry) => {
@@ -16,10 +18,8 @@ function makeQuery(queryObject) {
   return `?${query}`
 }
 
-const isServer = typeof window === 'undefined'
 export default function(Comp, type = 'index') {
   function WithDetail({ repoBasic, router, ...rest }) {
-    console.log(repoBasic)
     const query = makeQuery(router.query)
 
     useEffect(() => {
@@ -71,7 +71,6 @@ export default function(Comp, type = 'index') {
   }
 
   WithDetail.getInitialProps = async context => {
-    // console.log(ctx.query)
     const { router, ctx } = context
     const { owner, name } = ctx.query
 

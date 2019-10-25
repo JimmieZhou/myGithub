@@ -4,7 +4,7 @@
  * @Author: jimmiezhou
  * @Date: 2019-10-15 11:41:08
  * @LastEditors: jimmiezhou
- * @LastEditTime: 2019-10-23 15:40:45
+ * @LastEditTime: 2019-10-25 13:38:43
  */
 import { createStore, applyMiddleware } from "redux";
 import ReduxThunk from "redux-thunk";
@@ -25,11 +25,11 @@ export function logout() {
             type: LOGOUT
           });
         } else {
-          console.log("logout failed", resp);
+          console.log("logout failed...", resp);
         }
       })
       .catch(err => {
-        console.log("logout failed", err);
+        console.log("logout failed...", err);
       });
   };
 }

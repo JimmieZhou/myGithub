@@ -4,67 +4,57 @@
  * @Author: jimmiezhou
  * @Date: 2019-10-16 17:23:47
  * @LastEditors: jimmiezhou
- * @LastEditTime: 2019-10-23 15:28:31
+ * @LastEditTime: 2019-10-25 16:04:50
  */
-import { useEffect } from 'react'
-import { Button, Icon, Tabs } from 'antd'
-import getCofnig from 'next/config'
-import { connect } from 'react-redux'
-import Router, { withRouter } from 'next/router'
-import LRU from 'lru-cache'
+import { useEffect } from "react";
+import { Button, Icon, Tabs } from "antd";
+import getCofnig from "next/config";
+import { connect } from "react-redux";
+import Router, { withRouter } from "next/router";
+import Repo from "../components/Repo";
+import { cacheArray } from "../lib/repo-basic-cache";
+import { isServer } from "../lib/utils";
 
-import Repo from '../components/Repo'
-import { cacheArray } from '../lib/repo-basic-cache'
+const api = require("../lib/api");
 
-const api = require('../lib/api')
+const { publicRuntimeConfig } = getCofnig();
 
-// const cache = new LRU({
-//   maxAge: 1000 * 10,
-// })
+let cachedUserRepos, cachedUserStaredRepos;
 
-const { publicRuntimeConfig } = getCofnig()
-
-let cachedUserRepos, cachedUserStaredRepos
-
-const isServer = typeof window === 'undefined'
-
-function Index({ userRepos, userStaredRepos, user, router }) {
-  // console.log(userRepos, userStaredRepos)
-
-  const tabKey = router.query.key || '1'
+const Index = ({ userRepos, userStaredRepos, user, router }) => {
+  const tabKey = router.query.key || "1";
 
   const handleTabChange = activeKey => {
-    Router.push(`/?key=${activeKey}`)
-  }
+    Router.push(`/?key=${activeKey}`);
+  };
 
   useEffect(() => {
     if (!isServer) {
-      cachedUserRepos = userRepos
-      cachedUserStaredRepos = userStaredRepos
-      // if (userRepos) {
-      //   cache.set('userRepos', userRepos)
-      // }
-      // if (userStaredRepos) {
-      //   cache.set('userStaredRepos', userStaredRepos)
-      // }
+      cachedUserRepos = userRepos;
+      cachedUserStaredRepos = userStaredRepos;
+      // 缓存失效时间设置
       const timeout = setTimeout(() => {
-        cachedUserRepos = null
-        cachedUserStaredRepos = null
-      }, 1000 * 60 * 10)
+        cachedUserRepos = null;
+        cachedUserStaredRepos = null;
+      }, 1000 * 60 * 10);
+      return () => {
+        clearTimeout(timeout);
+      };
     }
-  }, [userRepos, userStaredRepos])
+  }, [userRepos, userStaredRepos]);
 
   useEffect(() => {
     if (!isServer) {
-      cacheArray(userRepos)
-      cacheArray(userStaredRepos)
+      cacheArray(userRepos);
+      cacheArray(userStaredRepos);
     }
-  })
+  });
 
   if (!user || !user.id) {
     return (
       <div className="root">
         <p>亲，您还没有登录哦~</p>
+        {/* 当发送这个请求的时候，会首先去github oath获取code，通过client_id和scope */}
         <Button type="primary" href={publicRuntimeConfig.OAUTH_URL}>
           点击登录
         </Button>
@@ -78,7 +68,7 @@ function Index({ userRepos, userStaredRepos, user, router }) {
           }
         `}</style>
       </div>
-    )
+    );
   }
 
   return (
@@ -94,9 +84,6 @@ function Index({ userRepos, userStaredRepos, user, router }) {
         </p>
       </div>
       <div className="user-repos">
-        {/* {userRepos.map(repo => (
-          <Repo repo={repo} />
-        ))} */}
         <Tabs activeKey={tabKey} onChange={handleTabChange} animated={false}>
           <Tabs.TabPane tab="你的仓库" key="1">
             {userRepos.map(repo => (
@@ -145,66 +132,67 @@ function Index({ userRepos, userStaredRepos, user, router }) {
         }
       `}</style>
     </div>
-  )
-}
+  );
+};
+
+/**
+ * 请求github个人仓库和关注仓库的数据
+ */
+const fetchIndexDatas = async ctx => {
+  const fetchs = await Promise.all([
+    await api.request(
+      {
+        url: "/user/repos"
+      },
+      ctx.req,
+      ctx.res
+    ),
+    await api.request(
+      {
+        url: "/user/starred"
+      },
+      ctx.req,
+      ctx.res
+    )
+  ]);
+  const [userRepos, userStaredRepos] = fetchs;
+  return {
+    userRepos,
+    userStaredRepos
+  };
+};
 
 Index.getInitialProps = async ({ ctx, reduxStore }) => {
-  // const result = await axios
-  //   .get('/github/search/repositories?q=react')
-  //   .then(resp => console.log(resp))
-
-  const user = reduxStore.getState().user
-  console.log(reduxStore)
+  console.log("----index-getInitialProps", Date.now());
+  const user = reduxStore.getState().user;
   if (!user || !user.id) {
     return {
-      isLogin: false,
-    }
+      isLogin: false
+    };
   }
 
   if (!isServer) {
-    // if (cache.get('userRepos') && cache.get('userStaredRepos')) {
-    //   return {
-    //     userRepos: cache.get('userRepos'),
-    //     userStaredRepos: cache.get('userStaredRepos'),
-    //   }
-    // }
-
     if (cachedUserRepos && cachedUserStaredRepos) {
       return {
         userRepos: cachedUserRepos,
-        userStaredRepos: cachedUserStaredRepos,
-      }
+        userStaredRepos: cachedUserStaredRepos
+      };
     }
   }
 
-  const userRepos = await api.request(
-    {
-      url: '/user/repos',
-    },
-    ctx.req,
-    ctx.res,
-  )
-
-  const userStaredRepos = await api.request(
-    {
-      url: '/user/starred',
-    },
-    ctx.req,
-    ctx.res,
-  )
+  const { userRepos, userStaredRepos } = await fetchIndexDatas(ctx);
 
   return {
     isLogin: true,
     userRepos: userRepos.data,
-    userStaredRepos: userStaredRepos.data,
-  }
-}
+    userStaredRepos: userStaredRepos.data
+  };
+};
 
 export default withRouter(
   connect(function mapState(state) {
     return {
-      user: state.user,
-    }
-  })(Index),
-)
-
+      user: state.user
+    };
+  })(Index)
+);

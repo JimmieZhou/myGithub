@@ -1,87 +1,58 @@
-import { useState, useCallback } from 'react'
-import getCofnig from 'next/config'
-import { connect } from 'react-redux'
-import { withRouter } from 'next/router'
+/**
+ * 自定义页面布局
+ */
+import { useState, useCallback } from "react";
+import { connect } from "react-redux";
+import Link from "next/link";
+import { withRouter } from "next/router";
+import { Layout, Icon, Input, Avatar, Tooltip, Dropdown, Menu } from "antd";
+import Container from "./Container";
+import { logout } from "../store/store";
 
-import axios from 'axios'
-
-import Link from 'next/link'
-import {
-  Button,
-  Layout,
-  Icon,
-  Input,
-  Avatar,
-  Tooltip,
-  Dropdown,
-  Menu,
-} from 'antd'
-
-import Container from './Container'
-
-import { logout } from '../store/store'
-
-const { Header, Content, Footer } = Layout
-
-const { publicRuntimeConfig } = getCofnig()
+const { Header, Content, Footer } = Layout;
 
 const githubIconStyle = {
-  color: 'white',
+  color: "#fff",
   fontSize: 40,
-  display: 'block',
+  display: "block",
   paddingTop: 10,
-  marginRight: 20,
-}
+  marginRight: 20
+};
 
 const footerStyle = {
-  textAlign: 'center',
-}
+  textAlign: "center"
+};
 
-function MyLayout({ children, user, logout, router }) {
-  const urlQuery = router.query && router.query.query
-
-  const [search, setSearch] = useState(urlQuery || '')
+const MyLayout = ({ children, user, logout, router }) => {
+  const urlQuery = router.query && router.query.query;
+  const [search, setSearch] = useState(urlQuery || "");
 
   const handleSearchChange = useCallback(
-    event => {
-      setSearch(event.target.value)
+    e => {
+      setSearch(e.target.value);
     },
-    [setSearch],
-  )
+    [setSearch]
+  );
 
   const handleOnSearch = useCallback(() => {
-    router.push(`/search?query=${search}`)
-  }, [search])
+    router.push(`/search?query=${search}`);
+  }, [search]);
 
-  const handleLogout = useCallback(() => {
-    logout()
-  }, [logout])
-
-  const handleGotoOAuth = useCallback(e => {
-    e.preventDefault()
-    axios
-      .get(`/prepare-auth?url=${router.asPath}`)
-      .then(resp => {
-        if (resp.status === 200) {
-          location.href = publicRuntimeConfig.OAUTH_URL
-        } else {
-          console.log('prepare auth failed', resp)
-        }
-      })
-      .catch(err => {
-        console.log('prepare auth failed', err)
-      })
-  }, [])
+  const handleLogout = useCallback(
+    e => {
+      e.preventDefault();
+      logout();
+    },
+    [logout]
+  );
 
   const userDropDown = (
     <Menu>
       <Menu.Item>
-        <a href="javascript:void(0)" onClick={handleLogout}>
-          登 出
-        </a>
+        <a onClick={handleLogout}>登 出</a>
       </Menu.Item>
     </Menu>
-  )
+  );
 
   return (
     <Layout>
@@ -125,8 +96,8 @@ function MyLayout({ children, user, logout, router }) {
         <Container>{children}</Container>
       </Content>
       <Footer style={footerStyle}>
-        Develop by Jokcy @
-        <a href="mailto:jokcy@hotmail.com">jokcy@hotmail.com</a>
+        Develop by Jimmie @
+        <a href="mailto:JimmieZhou@126.com">JimmieZhou@126.com</a>
       </Footer>
       <style jsx>{`
         .content {
@@ -157,18 +128,18 @@ function MyLayout({ children, user, logout, router }) {
         }
       `}</style>
     </Layout>
-  )
-}
+  );
+};
 
 export default connect(
-  function mapState(state) {
+  function mapStateToProps(state) {
     return {
-      user: state.user,
-    }
+      user: state.user
+    };
   },
-  function mapReducer(dispatch) {
+  function mapDispathToProps(dispatch) {
     return {
-      logout: () => dispatch(logout()),
-    }
-  },
-)(withRouter(MyLayout))
+      logout: () => dispatch(logout())
+    };
+  }
+)(withRouter(MyLayout));

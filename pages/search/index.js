@@ -4,7 +4,7 @@
  * @Author: jimmiezhou
  * @Date: 2019-10-17 17:20:52
  * @LastEditors: jimmiezhou
- * @LastEditTime: 2019-10-23 15:39:49
+ * @LastEditTime: 2019-10-25 15:33:18
  */
 import { memo, isValidElement, useEffect } from "react";
 import { withRouter } from "next/router";
@@ -13,6 +13,7 @@ import Link from "next/link";
 import Repo from "../../components/Repo";
 import { cacheArray } from "../../lib/repo-basic-cache";
 import { LANGUAGES, SORT_TYPES } from "./static";
+import { isServer } from "../../lib/utils";
 
 const api = require("../../lib/api");
 
@@ -32,7 +33,6 @@ function noop() {}
 
 const per_page = 20;
 
-const isServer = typeof window === "undefined";
 const FilterLink = memo(({ name, query, lang, sort, order, page }) => {
   let queryString = `?query=${query}`;
   if (lang) queryString += `&lang=${lang}`;
@@ -112,24 +112,26 @@ function Search({ router, repos }) {
           {repos.items.map(repo => (
             <Repo repo={repo} key={repo.id} />
           ))}
-          <div className="pagination">
-            <Pagination
-              pageSize={per_page}
-              current={Number(page) || 1}
-              total={1000}
-              onChange={noop}
-              itemRender={(page, type, ol) => {
-                const p =
-                  type === "page"
-                    ? page
-                    : type === "prev"
-                    ? page - 1
-                    : page + 1;
-                const name = type === "page" ? page : ol;
-                return <FilterLink {...querys} page={p} name={name} />;
-              }}
-            />
-          </div>
+          {repos.items.length ? (
+            <div className="pagination">
+              <Pagination
+                pageSize={per_page}
+                current={Number(page) || 1}
+                total={1000}
+                onChange={noop}
+                itemRender={(page, type, ol) => {
+                  const p =
+                    type === "page"
+                      ? page
+                      : type === "prev"
+                      ? page - 1
+                      : page + 1;
+                  const name = type === "page" ? page : ol;
+                  return <FilterLink {...querys} page={p} name={name} />;
+                }}
+              />
+            </div>
+          ) : null}
         </Col>
       </Row>
       <style jsx>{`
@@ -155,13 +157,13 @@ function Search({ router, repos }) {
 }
 
 Search.getInitialProps = async ({ ctx }) => {
-  // console.log(ctx)
+  console.log('----search-getInitialProps',Date.now())
   const { query, sort, lang, order, page } = ctx.query;
-
   if (!query) {
     return {
       repos: {
-        total_count: 0
+        total_count: 0,
+        items: []
       }
     };
   }

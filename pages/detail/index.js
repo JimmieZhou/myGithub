@@ -4,7 +4,7 @@
  * @Author: jimmiezhou
  * @Date: 2019-10-17 14:43:27
  * @LastEditors: jimmiezhou
- * @LastEditTime: 2019-10-23 15:29:04
+ * @LastEditTime: 2019-10-25 15:55:49
  */
 
 import dynamic from "next/dynamic";
@@ -25,7 +25,7 @@ Detail.getInitialProps = async ({
     res
   }
 }) => {
-  // console.log('detail getInitialProps invoked')
+  console.log('----detail',Date.now())
 
   const readmeResp = await api.request(
     {
