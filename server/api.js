@@ -14,7 +14,7 @@ module.exports = server => {
     const { path, method } = ctx;
     // 所有客户端的请求都做接口代理
     if (path.startsWith("/github/")) {
-      console.log('----api代理',Date.now())
+      console.log('api代理......',Date.now())
       const session = ctx.session;
       const githubAuth = session && session.githubAuth;
       const headers = {};

@@ -253,7 +253,7 @@ const Issues = ({ initialIssues, labels, owner, name }) => {
 };
 
 Issues.getInitialProps = async ({ ctx }) => {
-  console.log("----issue", Date.now());
+  console.log("issue......", Date.now());
 
   const { owner, name } = ctx.query;
 

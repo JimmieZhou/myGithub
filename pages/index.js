@@ -4,7 +4,7 @@
  * @Author: jimmiezhou
  * @Date: 2019-10-16 17:23:47
  * @LastEditors: jimmiezhou
- * @LastEditTime: 2019-10-25 16:27:30
+ * @LastEditTime: 2019-10-28 09:47:08
  */
 import { useEffect } from "react";
 import { Button, Icon, Tabs } from "antd";
@@ -81,7 +81,7 @@ const Index = ({ userRepos, userStaredRepos, user, router }) => {
         <span className="bio">{user.bio}</span>
         <p className="email">
           <Icon type="mail" style={{ marginRight: 10 }} />
-          <a href={`mailto:${user.email}`}>{user.email}</a>
+          <a href={`mailto:${user.blog}`}>{user.blog}</a>
         </p>
       </div>
       <div className="user-repos">
@@ -164,7 +164,7 @@ const fetchIndexDatas = async ctx => {
 };
 
 Index.getInitialProps = async ({ ctx, reduxStore }) => {
-  console.log("----index-getInitialProps", Date.now());
+  console.log("index-getInitialProps......", Date.now());
   const user = reduxStore.getState().user;
   if (!user || !user.id) {
     return {

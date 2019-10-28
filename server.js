@@ -4,7 +4,7 @@
  * @Author: jimmiezhou
  * @Date: 2019-10-14 09:48:57
  * @LastEditors: jimmiezhou
- * @LastEditTime: 2019-10-25 15:30:37
+ * @LastEditTime: 2019-10-28 10:18:51
  */
 const Koa = require("koa");
 const Router = require("koa-router");
@@ -27,7 +27,7 @@ const redis = new Redis();
 global.atob = atob;
 
 app.prepare().then(() => {
-  console.log('----server into',Date.now())
+  console.log("server into......", Date.now());
   const server = new Koa();
   const router = new Router();
 

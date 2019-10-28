@@ -13,7 +13,7 @@ module.exports = server => {
   server.use(async (ctx, next) => {
     // 1. 通过client_id 获取到code，同时路由跳转为xxx/auth?code=xxx
     if (ctx.path === "/auth") {
-      console.log('----auth',Date.now())
+      console.log('auth......',Date.now())
       const code = ctx.query.code;
       if (!code) {
         ctx.body = "code not exist";
@@ -56,7 +56,7 @@ module.exports = server => {
   server.use(async (ctx, next) => {
     const { path, method } = ctx;
     if (path === "/prepare-auth" && method === "GET") {
-      console.log('----prepare-auth',Date.now())
+      console.log('prepare-auth......',Date.now())
       const { url } = ctx.query;
       // 保持在任何页面刷新时，都能在当前页面刷新
       ctx.session.urlBeforeOAuth = url;

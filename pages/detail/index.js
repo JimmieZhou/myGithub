@@ -25,7 +25,7 @@ Detail.getInitialProps = async ({
     res
   }
 }) => {
-  console.log('----detail',Date.now())
+  console.log('detail......',Date.now())
 
   const readmeResp = await api.request(
     {

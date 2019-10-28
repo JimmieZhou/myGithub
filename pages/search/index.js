@@ -159,7 +159,7 @@ const makeQuery = queryObj => {
 };
 
 Search.getInitialProps = async ({ ctx }) => {
-  console.log("----search-getInitialProps", Date.now());
+  console.log("search-getInitialProps......", Date.now());
   const { query } = ctx.query;
   if (!query) {
     return {

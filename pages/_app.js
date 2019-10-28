@@ -4,7 +4,7 @@
  * @Author: jimmiezhou
  * @Date: 2019-10-14 11:19:38
  * @LastEditors: jimmiezhou
- * @LastEditTime: 2019-10-25 14:49:07
+ * @LastEditTime: 2019-10-28 10:28:41
  */
 import App, { Container } from "next/app";
 import { Provider } from "react-redux";
@@ -49,7 +49,7 @@ class MyApp extends App {
   // 静态方法，便于在withRedux中获取getInitialProps
   static async getInitialProps(ctx) {
     const { Component } = ctx;
-    console.log("app init...");
+    console.log("app init.......");
     let pageProps = {};
     if (Component.getInitialProps) {
       pageProps = await Component.getInitialProps(ctx);
